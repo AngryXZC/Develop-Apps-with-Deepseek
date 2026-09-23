@@ -4,6 +4,8 @@
 
 按书中章节练习 OpenAI 兼容 API（当前用 DeepSeek），边读边写、边跑边记。
 
+每日小结写在 Notion：[第二章深入了解 OpenAI API](https://app.notion.com/p/3e42386ee733810ab729f2477c342af2)（父页面「大模型应用极简入门」）。仓库里不再放 `笔记/`。
+
 ## 环境
 
 - Conda 环境：`ai_code`
@@ -23,12 +25,16 @@ python 第二章/vision_local_invoke.py
 python 第二章/vision_multi_invoke.py
 python 第二章/json_invoke.py
 python 第二章/tools_invoke.py
+python 第二章/embedding_local.py
+python 第二章/tts_invoke.py
+python 第二章/stt_invoke.py
+python 第二章/speech_translate_invoke.py
 ```
 
 不要用 Homebrew 的 `pip3` 往系统 Python 装包。应在已激活的 `ai_code` 里：
 
 ```bash
-python -m pip install openai tiktoken
+python -m pip install openai tiktoken sentence-transformers funasr kaldi-native-fbank edge-tts faster-whisper
 ```
 
 ### 目录结构
@@ -45,7 +51,11 @@ ai_code_project/
     ├── vision_local_invoke.py
     ├── vision_multi_invoke.py
     ├── json_invoke.py
-    └── tools_invoke.py
+    ├── tools_invoke.py
+    ├── embedding_local.py
+    ├── tts_invoke.py
+    ├── stt_invoke.py
+    └── speech_translate_invoke.py
 ```
 
 本地图片路径由脚本用「项目根 / 图片 / …」解析（`Path(__file__).parent.parent / "图片"`），因此请在**项目根**执行 `python 第二章/...`，或从任意 cwd 运行均可（不依赖当前工作目录）。
@@ -74,6 +84,12 @@ Cursor 用 ▶ 运行时，若读不到变量：在集成终端里先 `source ~/
 | `第二章/vision_multi_invoke.py` | 视觉：本地双图对比（`图片/百度图片_龙.png` + `图片/百度图片_青龙.png`） |
 | `第二章/json_invoke.py` | `response_format=json_object`：把购鞋需求转成 JSON |
 | `第二章/tools_invoke.py` | Function Calling：`tools` → 本地 `find_product` → `role=tool` → 自然语言 |
+| `第二章/embedding_local.py` | 本机嵌入：`BAAI/bge-m3`，`encode` 得到 1024 维向量 |
+| `第二章/tts_invoke.py` | 文本转语音：`edge-tts`，音色 `zh-CN-XiaoxiaoNeural`，输出 `tts_hello.mp3` |
+| `第二章/stt_invoke.py` | 语音转文本：SenseVoice Small 转写 `tts_hello.mp3` |
+| `第二章/speech_translate_invoke.py` | 法语 mp3（edge-tts）→ faster-whisper 原文转写 / 译成英文 |
+
+图像 API（生成 / 编辑 / 变体）记在 Notion，没有示例脚本。OpenAI 现用 `gpt-image-2.5-flare` 与 `gpt-image-2.5-sunburst`，书上的 DALL·E 已从 API 下线。
 
 ### 视觉输入（第二章）
 
@@ -180,3 +196,26 @@ print(enc.decode(tokens))    # 解码回文本
 聊天请求除了正文，还有 `role` 等开销，粗算时每条消息再加点固定 token。
 
 注意：DeepSeek **不是**同一套分词器。`tiktoken` 适合练书里的概念；对 DeepSeek 计费只能近似，以官方用量/文档为准。
+
+### 嵌入与语音
+
+DeepSeek 只有对话（含视觉、JSON、工具调用）。嵌入、审核、语音、生图都要另找。
+
+| 书上 | 本仓库 |
+|------|--------|
+| Embeddings | `embedding_local.py`：本机 `BAAI/bge-m3`，1024 维。不同模型的向量不要混着比 |
+| `audio.speech`（tts-1） | `tts_invoke.py`：`edge-tts`，音色 `zh-CN-XiaoxiaoNeural` |
+| `audio.transcriptions`（whisper-1） | `stt_invoke.py`：SenseVoice Small，转写中文 |
+| `audio.translations`（whisper-1） | `speech_translate_invoke.py`：faster-whisper，`task="translate"` 译成英文 |
+
+法语演示句转写与原文一致。英译实测是 “Mathematics are a fundamental science.”，书上是 is。SenseVoice 不能把语音译成英文。
+
+审核端点没有免费平替，未写示例。旧的文本补全端点 DeepSeek 不支持，示例已删。
+
+### 图像 API
+
+书上三种：生成（提示词出图）、编辑（按提示词改原图）、变体（保持主题换画法）。撰写时编辑和变体只有 DALL·E 2。
+
+现在 OpenAI 的模型是 `gpt-image-2.5-flare`（更快）和 `gpt-image-2.5-sunburst`（画质和改图更好）。`dall-e-2`、`dall-e-3` 已于 2026-05-12 下线。
+
+国内没有三项都免费、还能直连的接口。通义万相能生成和编辑，付费。2026-08-21 硅基流动价格页上 `Kwai-Kolors/Kolors` 按张免费（要实名、有限额，用前再核对）。本机可用 Z-Image-Turbo，没有独显会很慢。详情在 Notion 的 2026-09-23 一节。
