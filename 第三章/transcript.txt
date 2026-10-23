@@ -1,0 +1,5 @@
+Hello and welcome. Today we look at how a chat API stays stateless.
+Each request must resend the full message list, or the model cannot see earlier turns.
+We also compare two ways to steer the answer: give the model a role, and state the task precisely.
+For example, tell it the facts, the tone, the length, and the style.
+That is the whole idea of this short video. Thanks for watching.

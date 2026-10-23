@@ -29,12 +29,19 @@ python 第二章/embedding_local.py
 python 第二章/tts_invoke.py
 python 第二章/stt_invoke.py
 python 第二章/speech_translate_invoke.py
+python 第三章/journalist_invoke.py
+python 第三章/transcript_summary_invoke.py
+python 第三章/video_summary_invoke.py
+python 第三章/data_service.py
+python 第三章/intent_service.py
+python 第三章/response_service.py
+python 第三章/run.py
 ```
 
 不要用 Homebrew 的 `pip3` 往系统 Python 装包。应在已激活的 `ai_code` 里：
 
 ```bash
-python -m pip install openai tiktoken sentence-transformers funasr kaldi-native-fbank edge-tts faster-whisper
+python -m pip install openai tiktoken sentence-transformers funasr kaldi-native-fbank edge-tts faster-whisper opencv-python pypdf redis
 ```
 
 ### 目录结构
@@ -45,7 +52,7 @@ ai_code_project/
 ├── 图片/                 # 本地视觉示例用图（项目根）
 │   ├── 百度图片_龙.png
 │   └── 百度图片_青龙.png
-└── 第二章/               # 第 2 章代码
+├── 第二章/               # 第 2 章代码
     ├── api_invoke.py
     ├── vision_invoke.py
     ├── vision_local_invoke.py
@@ -56,6 +63,19 @@ ai_code_project/
     ├── tts_invoke.py
     ├── stt_invoke.py
     └── speech_translate_invoke.py
+└── 第三章/               # 第 3 章代码
+    ├── journalist_invoke.py
+    ├── transcript.txt
+    ├── transcript_summary_invoke.py
+    ├── video_summary_invoke.py
+    ├── data_service.py
+    ├── intent_service.py
+    ├── response_service.py
+    ├── run.py
+    ├── pdf/
+    │   └── ExplorersGuide.pdf
+    └── 视频/
+        └── sample_640x360.mp4
 ```
 
 本地图片路径由脚本用「项目根 / 图片 / …」解析（`Path(__file__).parent.parent / "图片"`），因此请在**项目根**执行 `python 第二章/...`，或从任意 cwd 运行均可（不依赖当前工作目录）。
@@ -88,6 +108,13 @@ Cursor 用 ▶ 运行时，若读不到变量：在集成终端里先 `source ~/
 | `第二章/tts_invoke.py` | 文本转语音：`edge-tts`，音色 `zh-CN-XiaoxiaoNeural`，输出 `tts_hello.mp3` |
 | `第二章/stt_invoke.py` | 语音转文本：SenseVoice Small 转写 `tts_hello.mp3` |
 | `第二章/speech_translate_invoke.py` | 法语 mp3（edge-tts）→ faster-whisper 原文转写 / 译成英文 |
+| `第三章/journalist_invoke.py` | 记者助手提示词：角色 + FACTS / TONE / LENGTH / STYLE；`deepseek-flash` |
+| `第三章/transcript_summary_invoke.py` | 读 `transcript.txt`，让模型摘要视频转写文稿 |
+| `第三章/video_summary_invoke.py` | OpenCV 每 50 帧抽 1 张，`deepseek-flash` 看图写两句摘要 |
+| `第三章/data_service.py` | PDF 分块嵌入后写入 Redis，再按问题做 KNN 向量搜索；模型 `BAAI/bge-m3` |
+| `第三章/intent_service.py` | 从用户问题抽出关键词，不回答问题；`deepseek-flash` |
+| `第三章/response_service.py` | 只根据检索到的事实回答问题；`deepseek-flash` |
+| `第三章/run.py` | 串起嵌入、关键词、Redis 检索和回答 |
 
 图像 API（生成 / 编辑 / 变体）记在 Notion，没有示例脚本。OpenAI 现用 `gpt-image-2.5-flare` 与 `gpt-image-2.5-sunburst`，书上的 DALL·E 已从 API 下线。
 
