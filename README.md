@@ -36,12 +36,15 @@ python 第三章/data_service.py
 python 第三章/intent_service.py
 python 第三章/response_service.py
 python 第三章/run.py
+python 第三章/whisper_transcribe.py
+python 第三章/state_machine.py
+python 第三章/assistant_ui.py
 ```
 
 不要用 Homebrew 的 `pip3` 往系统 Python 装包。应在已激活的 `ai_code` 里：
 
 ```bash
-python -m pip install openai tiktoken sentence-transformers funasr kaldi-native-fbank edge-tts faster-whisper opencv-python pypdf redis
+python -m pip install openai tiktoken sentence-transformers funasr kaldi-native-fbank edge-tts faster-whisper opencv-python pypdf redis gradio
 ```
 
 ### 目录结构
@@ -72,6 +75,9 @@ ai_code_project/
     ├── intent_service.py
     ├── response_service.py
     ├── run.py
+    ├── whisper_transcribe.py
+    ├── state_machine.py
+    ├── assistant_ui.py
     ├── pdf/
     │   └── ExplorersGuide.pdf
     └── 视频/
@@ -115,6 +121,9 @@ Cursor 用 ▶ 运行时，若读不到变量：在集成终端里先 `source ~/
 | `第三章/intent_service.py` | 从用户问题抽出关键词，不回答问题；`deepseek-flash` |
 | `第三章/response_service.py` | 只根据检索到的事实回答问题；`deepseek-flash` |
 | `第三章/run.py` | 串起嵌入、关键词、Redis 检索和回答 |
+| `第三章/whisper_transcribe.py` | 本地 faster-whisper `base` 把音频转成文字 |
+| `第三章/state_machine.py` | 状态机：意图分类、回答、追问，或执行写邮件；停在 MORE 时下一句接在同一段历史上；`deepseek-flash` |
+| `第三章/assistant_ui.py` | Gradio：麦克风 → faster-whisper 转写 → 状态机 |
 
 图像 API（生成 / 编辑 / 变体）记在 Notion，没有示例脚本。OpenAI 现用 `gpt-image-2.5-flare` 与 `gpt-image-2.5-sunburst`，书上的 DALL·E 已从 API 下线。
 
